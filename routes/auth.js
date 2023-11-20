@@ -29,11 +29,11 @@ router.post('/sign-up', async (req, res) =>{
     try{
         const newUser = await sequelize.transaction( async ()=> {
 
-            const user = await User.create({
+            const newUserInformation = await User.create({
                 email,
                 password
             });
-            return user;
+            return newUserInformation;
         });
         res.status(200).send(newUser);
     }catch(error){
