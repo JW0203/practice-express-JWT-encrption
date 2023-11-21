@@ -1,9 +1,11 @@
+require('dotenv').config()
 const {User} =require('../models');
 const sequelize = require('../config/database');
 const express = require('express');
 const app = express();
 const router = express.Router();
 const HttpExecption = require('../middleware/HttpException')
+const jwt = require('jsonwebtoken')
 app.use(express.json());
 
 
@@ -45,13 +47,44 @@ router.post('/sign-up', async (req, res, next) =>{
 
 })
 
+router.post('/sign-in', async(req, res, next) =>{
+    const {email, password} = req.body;
+
+    try{
+        const checkSignInValidation = await sequelize.transaction(async ()=>{
+
+            const user = await User.findOne({
+                where:{email : email}
+            });
+            if(!user){
+                throw new HttpExecption(401, "There is no matching email");
+                return;
+            }
+
+            if(user.password !== password){
+                throw new HttpExecption(401, "Passsword is wrong");
+                return;
+            }
+
+            const accessToken = jwt.sign({id: user.id}, process.env.JWT_SECRET_KEY,{
+                expiresIn: "10s"
+            });
+            res.status(200).send({ "ACCESS_TOKEN" :accessToken })
+        })
+
+    }catch(err){
+        next(err);
+    }
+
+})
+
 router.use((err, req, res, next) =>{
     console.log(err);
     if (err instanceof HttpExecption){
         res.status(err.status).send(err);
     }
     res.status(500).send({
-        message: "Error occurred while sign-up process"
+        message: "Internal Error occurred while processing"
     })
 })
 
