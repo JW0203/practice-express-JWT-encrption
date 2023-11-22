@@ -8,7 +8,8 @@ router.get('/', authenticateToken, async (req,res) =>{
     console.log(req.user)
     // const user = await User.findByPk(id);
     const foundUser = await User.findOne({
-        where:{id:id}
+        where:{id:id},
+        attributes: ['id', 'email', 'createdAt' ]
     })
     console.log(foundUser)
     res.status(200).send(foundUser);
