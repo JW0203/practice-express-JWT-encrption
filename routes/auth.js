@@ -41,8 +41,6 @@ router.post('/sign-up', async (req, res, next) =>{
         res.status(200).send(newUser);
     }catch(err){
         next(err);
-        // console.log('Error occurred while sign-up process')
-        // res.status(500).send(err)
     }
 
 })
@@ -67,7 +65,7 @@ router.post('/sign-in', async(req, res, next) =>{
             }
 
             const accessToken = jwt.sign({id: user.id}, process.env.JWT_SECRET_KEY,{
-                expiresIn: "120s"
+                expiresIn: "1s"
             });
             res.status(200).send({ "ACCESS_TOKEN" :accessToken })
         })
